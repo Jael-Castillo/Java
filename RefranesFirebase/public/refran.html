@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Refranes</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="estilos.css">
+    <script defer src="/__/firebase/5.5.4/firebase-app.js"></script>
+    <script defer src="/__/firebase/5.5.4/firebase-database.js"></script>
+    <script defer src="/__/firebase/init.js"></script>
+  </head>
+  <body>
+    <form class="vista" name="vista" action="javascript:guarda();">
+      <header>
+        <a accesskey="C" href="index.html">Cancelar</a>
+        <h1><output name="titulo">Refrán</output></h1>
+        <input type="submit" accesskey="G" value="Guardar">
+        <input type="button" accesskey="E" value="Eliminar"
+            onclick="javascript:elimina();">
+      </header>
+      <main role="main">
+        <p>
+          <label accesskey="T">
+            Texto
+            <textarea name="texto" required rows="2" autofocus></textarea>
+          </label>
+        </p>
+      </main>
+    </form>
+    <script>
+      "use strict";
+      const parametros = new URLSearchParams(location.search);
+      const id = parametros.get("id");
+      document.addEventListener('DOMContentLoaded', () => {
+        firebase.database().ref("pruebafirebase-1ddac").child(id).once("value",
+            dataSnapshot => {
+              if (dataSnapshot.exists) {
+                const modelo = dataSnapshot.val();
+                document.title = modelo.texto;
+                document.vista.titulo.value = modelo.texto;
+                document.vista.texto.value = modelo.texto;
+              }
+            },
+            muestraError);
+      });
+      function guarda() {
+        try {
+          const texto = document.vista.texto.value.trim();
+          valida(texto, "Falta el texto.");
+          valida(texto.length <= 255,
+              "El texto tiene más de 255 caracteres.");
+          const modelo = {id: id, texto: texto};
+          ej(firebase.database().ref("pruebafirebase-1ddac").child(id).set(modelo));
+        } catch (e) {
+          muestraError(e)
+        }
+      }
+      function elimina() {
+        ej(firebase.database().ref("pruebafirebase-1ddac").child(id).remove());
+      }
+      function ej(promise) {
+        promise
+            .then(() => window.location = "index.html")
+            .catch(muestraError);
+      }
+      function valida(condicion, mensaje) {
+        if (!condicion) {
+          throw new Error(mensaje);
+        }
+      }
+      function muestraError(e) {
+        console.error(e);
+        alert(e.message);
+      }
+    </script>
+  </body>
+</html>

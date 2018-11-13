@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Refranes</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="estilos.css">
+    <script defer src="/__/firebase/5.5.4/firebase-app.js"></script>
+    <script defer src="/__/firebase/5.5.4/firebase-database.js"></script>
+    <script defer src="/__/firebase/init.js"></script>
+  </head>
+  <body class="vista">
+    <header>
+      <h1>Refranes</h1>
+      <a accesskey="A" href="refran_nuevo.html">Agregar...</a>
+    </header>
+    <main role="main">
+      <ul></ul>
+      <template>
+        <li>
+          <a></a>
+        </li>
+      </template>
+    </main>
+    <script src="https://www.gstatic.com/firebasejs/5.5.8/firebase.js"></script>
+    <script>
+      "use strict";
+      const ul = document.querySelector("ul");
+      
+      const template = document.querySelector("template");
+      document.addEventListener('DOMContentLoaded', () => {
+        firebase.database().ref("pruebafirebase-1ddac").on("value",
+            dataSnapshot => {
+              ul.innerHTML = "";
+              dataSnapshot.forEach(ds => {
+                const modelo = ds.val();
+                const a = template.content.querySelector("a");
+                a.href = "refran.html?id=" + encodeURIComponent(ds.key);
+                a.textContent = modelo.texto;
+                ul.appendChild(document.importNode(template.content, true));
+              })
+            },
+            muestraError);
+      });
+      function muestraError(e) {
+        console.error(e);
+        alert(e.message);
+      }
+    </script>
+
+  </body>
+</html>
